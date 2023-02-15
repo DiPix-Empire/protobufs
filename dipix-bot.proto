@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+/*
+ * Common
+ */
+message Empty {}
+
+/* 
+ * Minecraft server bidi-streams
+ * Used for chat/console/etc links
+ */
+message ChatMessage {
+	string sender = 1;		// nickname
+	string content = 2;		// message content
+}
+
+message ConsoleCommand {
+	string cmd = 1;
+}
+message ConsoleLog {
+	string content = 1; 
+}
+
+// A client-sided methods to open bidirectional stream
+service ChatMessageService {
+	rpc ConnectChat(stream ChatMessage) returns (stream ChatMessage);
+	rpc ConnectConsole(stream ConsoleCommand) returns (stream ConsoleLog);
+}
+
+/*
+ * Stat and info
+ */
+
+message PlayerList {
+	repeated string players = 1;
+}
+
+service Stats {
+	rpc PingServer(Empty) returns (Empty); // It works!	
+	rpc GetPlayers(Empty) returns (PlayerList); // Request a player list
+}
