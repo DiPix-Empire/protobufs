@@ -18,13 +18,16 @@ message ConsoleCommand {
 	string cmd = 1;
 }
 message ConsoleLog {
-	string content = 1; 
+	string raw = 1; 
 }
 
-// A client-sided methods to open bidirectional stream
+// A client-sided methods to open server-sided sctreams
+// Also push messages and commands
 service ChatMessageService {
-	rpc ConnectChat(stream ChatMessage) returns (stream ChatMessage);
-	rpc ConnectConsole(stream ConsoleCommand) returns (stream ConsoleLog);
+	rpc ConnectChat(Empty) returns (stream ChatMessage);
+	rpc ConnectConsole(Empty) returns (stream ConsoleLog);
+	rpc SendMessage(ChatMessage) returns (Empty);
+	rpc SendCommand(ConsoleCommand) returns (Empty);
 }
 
 /*
