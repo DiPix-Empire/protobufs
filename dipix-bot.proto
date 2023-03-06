@@ -5,10 +5,6 @@ syntax = "proto3";
  */
 message Empty {}
 
-/* 
- * Minecraft server bidi-streams
- * Used for chat/console/etc links
- */
 message ChatMessage {
 	string sender = 1;		// nickname
 	string content = 2;		// message content
@@ -23,22 +19,32 @@ message ConsoleLog {
 
 // A client-sided methods to open server-sided sctreams
 // Also push messages and commands
-service ChatMessageService {
-	rpc ConnectChat(Empty) returns (stream ChatMessage);
-	rpc ConnectConsole(Empty) returns (stream ConsoleLog);
-	rpc SendMessage(ChatMessage) returns (Empty);
-	rpc SendCommand(ConsoleCommand) returns (Empty);
-}
-
-/*
- * Stat and info
- */
+//! DEPRECATED
+// service ChatMessageService {
+// 	rpc ConnectChat(Empty) returns (stream ChatMessage);
+// 	rpc ConnectConsole(Empty) returns (stream ConsoleLog);
+// 	rpc SendMessage(ChatMessage) returns (Empty);
+// 	rpc SendCommand(ConsoleCommand) returns (Empty);
+// }
 
 message PlayerList {
 	repeated string players = 1;
 }
+//! DEPRECATED
+// service Stats {
+// 	rpc PingServer(Empty) returns (Empty); // It works!	
+// 	rpc GetPlayers(Empty) returns (PlayerList); // Request a player list
+// }
 
-service Stats {
-	rpc PingServer(Empty) returns (Empty); // It works!	
+// Data requested from bot by gameserver
+// Server - Bot; Client - Game
+service MinecraftToBot {
+	rpc MessagePool(stream ChatMessage) returns (stream ChatMessage);
+	rpc ConsolePool(stream ConsoleLog) returns (stream ConsoleCommand);
+}
+// Data required or sent by bot
+// Server - Game; Client - Bot
+service BotToMinecraft {
 	rpc GetPlayers(Empty) returns (PlayerList); // Request a player list
+	rpc Reconnect(Empty) returns (Empty); // Signal to reinit streams
 }
