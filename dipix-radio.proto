@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+
+// Common messages
+message APIStatus {
+	int32 code = 1; // 0 - OK, 1+ - error codes
+	string msg = 2;
+}
+message Empty { }
+
+// Bots manipulation
+message Instance { // Bot in the other words
+	string name = 1;
+	InstanceStatus status = 2;
+	string discordId = 3;
+}
+message Instances {
+	repeated Instance list = 1;
+}
+enum InstanceStatus {
+	INSTANCE_STATUS_PENDING = 0;
+	INSTANCE_STATUS_USING = 1;
+}
+message InstanceInitInfo {
+	string token = 1;
+}
+
+service Bot {
+	rpc Add(InstanceInitInfo) returns (Instance);
+	rpc Remove(Instance) returns (APIStatus);
+	rpc Get(Empty) returns (Instances);
+}
+
+// Session manipulation
+message SessionUnit {
+	Instance instance = 1;
+	SessionStatus status = 2;
+	string channelId = 3;
+}
+message Sessions {
+	repeated SessionUnit list = 1;
+}
+message SessionStartInfo {
+	string channelId = 1;
+}
+enum SessionStatus {
+	SESSION_STATUS_ACTIVE = 0;
+	SESSION_STATUS_OFF = 1;
+}
+
+service Session {
+	rpc Start(SessionStartInfo) returns (SessionUnit);
+	rpc Stop(SessionUnit) returns (APIStatus);
+	rpc Get(Empty) returns (Sessions);
+	rpc GetByInstance (Instance) returns (SessionUnit);
+}
+
+// Queue manipulation
+message QueueUnit {
+	string url = 1;
+	SessionUnit session = 2;
+}
+message QueueList {
+	repeated QueueUnit list = 1;
+	SessionUnit session = 2;
+}
+
+service Queue {
+	rpc Add(QueueUnit) returns (APIStatus);
+	rpc Delete(QueueUnit) returns (APIStatus);
+	rpc Get(SessionUnit) returns (QueueList);
+}
+
+// News manipulation
+message NewsUnit {
+	string url = 1;
+	string ownerId = 2;
+}
+
+service News {
+	rpc Add(NewsUnit) returns (APIStatus);
+	rpc Delete(NewsUnit) returns (APIStatus);
+	rpc Get(Empty) returns (APIStatus);
+}
